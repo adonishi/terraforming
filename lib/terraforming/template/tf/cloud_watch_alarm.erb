@@ -1,5 +1,6 @@
 <% alarms.each do |alarm| -%>
-resource "aws_cloudwatch_metric_alarm" "<%= normalize_module_name(alarm.alarm_name) %>" {
+<%     next if autoscaling?(alarm) -%>
+resource "aws_cloudwatch_metric_alarm" "<%= module_name_of(alarm) %>" {
     alarm_name          = "<%= alarm.alarm_name %>"
     comparison_operator = "<%= alarm.comparison_operator %>"
     evaluation_periods  = "<%= alarm.evaluation_periods %>"
@@ -27,6 +28,12 @@ resource "aws_cloudwatch_metric_alarm" "<%= normalize_module_name(alarm.alarm_na
 <%- end -%>
 <%- unless alarm.insufficient_data_actions.empty? -%>
     insufficient_data_actions = <%= alarm.insufficient_data_actions %>
+<%- end -%>
+<%- if alarm.treat_missing_data -%>
+    treat_missing_data     = "<%= alarm.treat_missing_data %>"
+<%- end -%>
+<%- if alarm.datapoints_to_alarm -%>
+    datapoints_to_alarm    = "<%= alarm.datapoints_to_alarm %>"
 <%- end -%>
 }
 

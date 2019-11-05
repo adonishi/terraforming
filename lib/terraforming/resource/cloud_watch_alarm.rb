@@ -13,6 +13,7 @@ module Terraforming
 
       def initialize(client)
         @client = client
+        @names = []
       end
 
       def tf
@@ -21,6 +22,7 @@ module Terraforming
 
       def tfstate
         alarms.inject({}) do |resources, alarm|
+          next resources if autoscaling?(alarm)
           resources["aws_cloudwatch_metric_alarm.#{module_name_of(alarm)}"] = {
             "type" => "aws_cloudwatch_metric_alarm",
             "primary" => {
@@ -57,7 +59,11 @@ module Terraforming
       end
 
       def module_name_of(alarm)
-        normalize_module_name(alarm.alarm_name)
+        name = normalize_module_name(alarm.alarm_name)
+        name = 'id' + name if name.start_with? '-'
+        name += 'a' while @names.include? name
+        @names << name
+        name
       end
 
       def sanitize(argument)
@@ -81,6 +87,12 @@ module Terraforming
         end
 
         attributes
+      end
+
+      def autoscaling?(alarm)
+        (
+          alarm.alarm_actions.any? { |act| act.include? 'autoscaling' }
+        )
       end
     end
   end
