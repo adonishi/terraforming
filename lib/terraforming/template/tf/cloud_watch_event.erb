@@ -1,0 +1,29 @@
+<% rules.each do |rule| -%>
+resource "aws_cloudwatch_event_rule" "<%= module_name_of(rule) %>" {
+    name                = "<%= rule.name %>"
+    description         = "<%= rule.description %>"
+    is_enabled          = "<%= rule.state != 'DISABLED' %>"
+<% if rule.schedule_expression -%>
+    schedule_expression = "<%= rule.schedule_expression %>"
+<%- end -%>
+<% unless (rule.event_pattern || '').empty? %>
+    event_pattern       = <<PATTERN
+<%= rule.event_pattern %>
+PATTERN
+<%- end -%>
+}
+
+<% target_array = targets_for_rule(rule.name) -%>
+<% target_array.each do |target| -%>
+<% hash = target.to_h -%>
+resource "aws_cloudwatch_event_target" "<%= module_name_of(target) %>" {
+  rule = "<%= rule.name %>"
+  target_id = "<%= hash.delete(:id) -%>"
+<% hash.each do |k,v| -%>
+  <%= k %> = "<%= v %>"
+<% end # TODO: support for other nested values -%>
+}
+
+<%- end -%>
+
+<%- end -%>

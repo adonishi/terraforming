@@ -87,6 +87,7 @@ Commands:
   terraforming alb             # ALB
   terraforming asg             # AutoScaling Group
   terraforming cwa             # CloudWatch Alarm
+  terraforming cwe             # CloudWatch Event
   terraforming dbpg            # Database Parameter Group
   terraforming dbsg            # Database Security Group
   terraforming dbsn            # Database Subnet Group
