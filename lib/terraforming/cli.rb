@@ -30,6 +30,11 @@ module Terraforming
       execute(Terraforming::Resource::CloudWatchEvent, options)
     end
 
+    desc "cwl", "CloudWatch Log"
+    def cwl
+      execute(Terraforming::Resource::CloudWatchLog, options)
+    end
+
     desc "dbpg", "Database Parameter Group"
     def dbpg
       execute(Terraforming::Resource::DBParameterGroup, options)

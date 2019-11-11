@@ -1,0 +1,24 @@
+<% groups.each do |group| -%>
+resource "aws_cloudwatch_log_group" "<%= module_name_of(group.log_group_name) %>" {
+    name                = "<%= group.log_group_name %>"
+    <%# arn                 = "<%= group.arn % >" %>
+<%- if group.retention_in_days -%>
+    retention_in_days   = "<%= group.retention_in_days %>"
+<%- end -%>
+<%- if group.kms_key_id -%>
+    kms_key_id          = "<%= group.kms_key_id %>"
+<%- end  # TODO: support 'tags' -%>
+}
+
+<% stream_array = streams_for_group(group) -%>
+<% stream_array.each do |stream| -%>
+resource "aws_cloudwatch_log_stream" "<%= module_name_of(stream.log_stream_name) %>" {
+  name           = "<%= stream.log_stream_name -%>"
+  log_group_name = "<%= group.log_group_name %>"
+<%- if false && stream.arn -%>
+  arn            = "<%= stream.arn %>"
+<%- end -%>
+}
+<%- end -%>
+
+<%- end -%>
